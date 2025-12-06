@@ -1,33 +1,42 @@
+import os
+import asyncio
+import requests # Added for manual API calls
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
+import warnings
+
+# Force CPU-only execution for TensorFlow to avoid CUDA errors
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
 import joblib
 import tensorflow as tf
-from tensorflow.keras.models import load_model
 from tensorflow import keras
 from keras import layers
-import yfinance as yf
-import os
-import warnings
-from concurrent.futures import ThreadPoolExecutor
-import asyncio
+
+# Suppress warnings
 warnings.filterwarnings("ignore")
 
-# Disable yfinance's problematic features
-os.environ['YF_ENABLE_REQUESTS_CACHE'] = '0'
-
-# --- Global Artifacts and Configuration ---
+# -------------------------
+# Global Variables
+# -------------------------
 MODEL = None
 SCALERS = None
 FEATURE_COLS = None
 TIME_STEPS = 10
 N_FEATURES = None
 
-# --- Model Architecture (Must match training exactly) ---
+# ThreadPoolExecutor for running synchronous tasks asynchronously
+executor = ThreadPoolExecutor(max_workers=4)
+
+# -------------------------
+# Transformer Model
+# -------------------------
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
-    """Transformer encoder block - must match training definition"""
     x = layers.LayerNormalization(epsilon=1e-6)(inputs)
     x = layers.MultiHeadAttention(
         key_dim=head_size, num_heads=num_heads, dropout=dropout
@@ -36,182 +45,187 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     res = x + inputs
     return x + res
 
-def build_model(
-    input_shape,
-    head_size,
-    num_heads,
-    ff_dim,
-    num_transformer_blocks,
-    mlp_units,
-    dropout=0,
-    mlp_dropout=0,
-):
-    """Build the complete transformer model - must match training"""
+def build_model(input_shape, head_size, num_heads, ff_dim, 
+                num_transformer_blocks, mlp_units, 
+                dropout=0, mlp_dropout=0):
     inputs = keras.Input(shape=input_shape)
     x = inputs
-
+    
     for _ in range(num_transformer_blocks):
         x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
-
+    
     x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
+    
     for dim in mlp_units:
         x = layers.Dense(dim, activation="elu")(x)
         x = layers.Dropout(mlp_dropout)(x)
+    
     outputs = layers.Dense(1, activation="linear")(x)
+    
     return keras.Model(inputs, outputs)
 
-# --- Feature Engineering Function (Must be identical to training script) ---
-def add_technical_features(df):
-    """Add technical indicators to the dataframe. Adjusted for live data."""
+# -------------------------
+# Feature Engineering
+# -------------------------
+def add_technical_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    
-    # Must use 'Close' price for all calculations
-    if 'Adj Close' in df.columns:
-        df = df.rename(columns={'Adj Close': 'Close'})
-    
-    df['Returns'] = df['Close'].pct_change()
-    df['MA_5'] = df['Close'].rolling(window=5).mean()
-    df['MA_10'] = df['Close'].rolling(window=10).mean()
-    df['MA_20'] = df['Close'].rolling(window=20).mean()
-    df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
-    df['Volatility'] = df['Returns'].rolling(window=10).std()
-    df['Momentum'] = df['Close'] - df['Close'].shift(5)
-    
-    delta = df['Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-    rs = gain / loss
-    df['RSI'] = 100 - (100 / (1 + rs))
-    
-    exp1 = df['Close'].ewm(span=12, adjust=False).mean()
-    exp2 = df['Close'].ewm(span=26, adjust=False).mean()
-    df['MACD'] = exp1 - exp2
-    df['MACD_Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
-    
-    df['BB_Middle'] = df['Close'].rolling(window=20).mean()
-    df['BB_Std'] = df['Close'].rolling(window=20).std()
-    df['BB_Upper'] = df['BB_Middle'] + (df['BB_Std'] * 2)
-    df['BB_Lower'] = df['BB_Middle'] - (df['BB_Std'] * 2)
-    
-    df['Volume_MA'] = df['Volume'].rolling(window=5).mean()
-    df['Volume_Ratio'] = df['Volume'] / df['Volume_MA']
-    
-    df['High_Low_Diff'] = df['High'] - df['Low']
-    df['High_Low_Pct'] = (df['High'] - df['Low']) / df['Low']
-    
-    df = df.dropna()
-    return df
 
-# --- Prediction Function (Identical to notebook) ---
+    # Rename Adj Close if it exists (though our manual fetcher returns 'Close')
+    if "Adj Close" in df.columns:
+        df = df.rename(columns={"Adj Close": "Close"})
+
+    # Simple Features
+    df["Returns"] = df["Close"].pct_change()
+    df["MA_5"] = df["Close"].rolling(5).mean()
+    df["MA_10"] = df["Close"].rolling(10).mean()
+    df["MA_20"] = df["Close"].rolling(20).mean()
+    df["EMA_12"] = df["Close"].ewm(span=12, adjust=False).mean()
+    df["Volatility"] = df["Returns"].rolling(10).std()
+    df["Momentum"] = df["Close"] - df["Close"].shift(5)
+
+    # RSI
+    delta = df["Close"].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    
+    with np.errstate(divide='ignore', invalid='ignore'):
+        rs = gain / loss
+        df["RSI"] = 100 - (100 / (1 + rs))
+        df["RSI"] = df["RSI"].fillna(100).replace([np.inf, -np.inf], 100)
+
+    # MACD
+    exp1 = df["Close"].ewm(span=12, adjust=False).mean()
+    exp2 = df["Close"].ewm(span=26, adjust=False).mean()
+    df["MACD"] = exp1 - exp2
+    df["MACD_Signal"] = df["MACD"].ewm(span=9, adjust=False).mean()
+    
+    # Bollinger Bands
+    df["BB_Middle"] = df["Close"].rolling(20).mean()
+    df["BB_Std"] = df["Close"].rolling(20).std()
+    df["BB_Upper"] = df["BB_Middle"] + 2 * df["BB_Std"]
+    df["BB_Lower"] = df["BB_Middle"] - 2 * df["BB_Std"]
+    
+    # Volume Features
+    df["Volume_MA"] = df["Volume"].rolling(5).mean()
+    with np.errstate(divide='ignore', invalid='ignore'):
+        df["Volume_Ratio"] = df["Volume"] / df["Volume_MA"]
+        df["Volume_Ratio"] = df["Volume_Ratio"].replace([np.inf, -np.inf], 1).fillna(1)
+    
+    # High-Low Features
+    df["High_Low_Diff"] = df["High"] - df["Low"]
+    with np.errstate(divide='ignore', invalid='ignore'):
+        df["High_Low_Pct"] = (df["High"] - df["Low"]) / df["Low"]
+        df["High_Low_Pct"] = df["High_Low_Pct"].replace([np.inf, -np.inf], 0).fillna(0)
+    
+    return df.dropna()
+
+# -------------------------
+# Recursive Forecast
+# -------------------------
 def recursive_forecast(ticker_data, model, scaler, feature_cols, timesteps, n_features, forecast_days=7):
-    # 1. Prepare the historical data and features
     df_prepared = add_technical_features(ticker_data)
-    
-    # Need at least 'timesteps' days of clean data to start prediction
+
     if len(df_prepared) < timesteps:
-        raise ValueError(f"Not enough historical data ({len(df_prepared)} days) to create a starting sequence of {timesteps} days.")
+        raise ValueError("Not enough historical data after feature engineering.")
 
-    # Get the last 'timesteps' days of data for the starting sequence
-    last_sequence_df = df_prepared.tail(timesteps)
+    last_seq = df_prepared.tail(timesteps)
+    scaled_input = scaler.transform(last_seq[feature_cols].values)
+    X = scaled_input.reshape(1, timesteps, n_features)
     
-    # Scale the last sequence
-    X_input_scaled = scaler.transform(last_sequence_df[feature_cols].values)
-    X_input_scaled = X_input_scaled.reshape(1, timesteps, n_features)
-    
-    predicted_prices = []
-    
-    # 2. Recursive Loop
+    preds = []
     for _ in range(forecast_days):
-        next_step_scaled = model.predict(X_input_scaled, verbose=0)
+        next_scaled = model.predict(X, verbose=0)
+        new_step = X[0, -1, :].copy()
+        new_step[0] = next_scaled[0, 0]
         
-        # Create the new timestep features vector (Copy last feature set)
-        new_timestep = X_input_scaled[0, -1, :].copy() 
+        X = np.roll(X, -1, axis=1)
+        X[0, -1, :] = new_step
         
-        # Inject the predicted Close price into the first feature slot (index 0)
-        new_timestep[0] = next_step_scaled[0, 0] 
-
-        # Update the sequence: Drop the oldest day, append the new prediction
-        X_input_scaled = np.roll(X_input_scaled, -1, axis=1)
-        X_input_scaled[0, -1, :] = new_timestep
-
-        # Inverse transform the predicted Close price for output
-        temp_full = np.zeros((1, n_features))
-        temp_full[0, 0] = next_step_scaled[0, 0]
-        predicted_price = scaler.inverse_transform(temp_full)[0, 0]
+        temp = np.zeros((1, n_features))
+        temp[0, 0] = next_scaled[0, 0]
+        pred = scaler.inverse_transform(temp)[0, 0]
+        preds.append(round(pred, 4))
         
-        predicted_prices.append(round(predicted_price, 4)) # Round to 4 decimals
+    return preds
+
+# -------------------------
+# Manual Data Fetching (Bypassing yfinance)
+# -------------------------
+def fetch_stock_data_sync(ticker: str):
+    """
+    Synchronous function to fetch data directly from Yahoo JSON API.
+    Bypasses yfinance library issues.
+    """
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    # Yahoo Finance Chart API (returns JSON) - 2 months range
+    url = f"https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=2mo"
+    
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        data = r.json()
+
+        # Validation
+        if "chart" not in data or "result" not in data["chart"] or not data["chart"]["result"]:
+            print(f"No data found for {ticker}")
+            return None
         
-    return predicted_prices
+        result = data["chart"]["result"][0]
+        
+        # Extract columns
+        timestamps = result["timestamp"]
+        quote = result["indicators"]["quote"][0]
+        
+        df = pd.DataFrame({
+            "Date": pd.to_datetime(timestamps, unit="s"),
+            "Open": quote["open"],
+            "High": quote["high"],
+            "Low": quote["low"],
+            "Close": quote["close"],
+            "Volume": quote["volume"]
+        })
 
-# --- FastAPI Initialization ---
-app = FastAPI(title="Stock Transformer Prediction Service")
+        # Drop any failed rows (Yahoo sometimes returns nulls)
+        df = df.dropna()
+        return df
 
-# Add CORS middleware
+    except Exception as e:
+        print(f"Error manually fetching data for {ticker}: {e}")
+        return None
+
+async def fetch_stock_data(ticker: str) -> pd.DataFrame | None:
+    """Wrapper to run the sync fetch in a thread."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(executor, lambda: fetch_stock_data_sync(ticker))
+
+# -------------------------
+# FastAPI App
+# -------------------------
+app = FastAPI(title="Stock Transformer Prediction API")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Thread pool for running blocking yfinance calls
-executor = ThreadPoolExecutor(max_workers=4)
-
-def fetch_stock_data_sync(ticker: str):
-    """Synchronous function to fetch stock data - runs in thread pool"""
-    try:
-        # Method 1: Try using Ticker with simpler approach
-        print(f"Attempting to download {ticker} data using Ticker.history()...")
-        ticker_obj = yf.Ticker(ticker)
-        data = ticker_obj.history(period="2mo")
-        
-        if not data.empty and len(data) >= 30:
-            print(f"✅ Successfully downloaded {len(data)} days of data for {ticker}")
-            return data
-        
-        # Method 2: Try download without session parameter
-        print(f"Trying yf.download for {ticker}...")
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=60)
-        
-        data = yf.download(
-            ticker, 
-            start=start_date.strftime('%Y-%m-%d'),
-            end=end_date.strftime('%Y-%m-%d'),
-            progress=False
-        )
-        
-        if not data.empty and len(data) >= 30:
-            print(f"✅ Successfully downloaded {len(data)} days of data for {ticker}")
-            return data
-        
-        print(f"❌ No data returned for {ticker}")
-        return None
-        
-    except Exception as e:
-        print(f"Error in fetch_stock_data_sync: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
-
+# -------------------------
+# Startup
+# -------------------------
 @app.on_event("startup")
 async def startup_event():
-    """Load the model and scalers once when the server starts."""
     global MODEL, SCALERS, FEATURE_COLS, N_FEATURES
-    
+
     try:
-        # Load Feature Columns first to determine architecture
         FEATURE_COLS = joblib.load("./model/feature_cols.pkl")
-        N_FEATURES = len(FEATURE_COLS)
-        print(f"✅ Feature columns loaded. N_FEATURES: {N_FEATURES}")
-        
-        # Load Scalers
         SCALERS = joblib.load("./model/all_scalers.pkl")
-        print("✅ Scalers loaded successfully.")
+        N_FEATURES = len(FEATURE_COLS)
         
-        # Rebuild the model architecture (must match training exactly)
         input_shape = (TIME_STEPS, N_FEATURES)
+        
         MODEL = build_model(
             input_shape,
             head_size=46,
@@ -222,115 +236,85 @@ async def startup_event():
             mlp_dropout=0.4,
             dropout=0.14,
         )
-        
-        # Compile the model
-        MODEL.compile(
-            loss="mean_squared_error",
-            optimizer=keras.optimizers.Adam(learning_rate=1e-4),
-            metrics=["mean_squared_error"],
-        )
-        print("✅ Model architecture rebuilt successfully.")
-        
-        # Load the trained weights
-        MODEL.load_weights("./model/transformer_stock.weights.h5")
-        print("✅ Model weights loaded successfully.")
-        
-    except FileNotFoundError as e:
-        print(f"ERROR: Model artifacts not found: {e}")
-        print("Please save model weights in the notebook using:")
-        print("  model.save_weights('../server/model/transformer_stock_weights.h5')")
-        raise
-    except Exception as e:
-        print(f"ERROR loading model: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
 
-# --- API Endpoint ---
-@app.get("/predict/{ticker}", summary="Get 7-day price forecast for a given stock ticker.")
-async def predict_price(ticker: str):
-    """
-    Accepts a stock ticker (e.g., AAPL) and returns the predicted closing prices 
-    for the next 7 market days.
-    """
-    
+        MODEL.compile(loss="mse", optimizer=keras.optimizers.Adam(learning_rate=1e-4), metrics=["mse"])
+        MODEL.load_weights("./model/transformer_stock.weights.h5")
+        
+        print("✅ Model and scalers loaded successfully.")
+
+    except Exception as e:
+        print(f"❌ Error during startup loading: {e}")
+        MODEL = None
+        SCALERS = None
+
+# -------------------------
+# Prediction Endpoint (Updated)
+# -------------------------
+@app.get("/predict/{ticker}")
+async def predict(ticker: str):
+    if MODEL is None or SCALERS is None:
+        raise HTTPException(status_code=503, detail="Model service is not fully initialized.")
+        
     if ticker not in SCALERS:
-        # Ticker not in the list the model was trained on
-        raise HTTPException(status_code=404, detail=f"Ticker '{ticker}' not in the trained list. Scaler missing.")
+        raise HTTPException(status_code=404, detail=f"Scaler not found for ticker '{ticker}'")
+
+    data = await fetch_stock_data(ticker)
+
+    MIN_DATA_POINTS = 30
+    if data is None or len(data) < MIN_DATA_POINTS:
+        raise HTTPException(status_code=400, detail=f"Insufficient data for '{ticker}'. Need >{MIN_DATA_POINTS} points.")
+
+    # --- 1. Extract Historical Data (New) ---
+    historical_data = data.tail(7)[["Date", "Close"]].copy()
+    
+    # Format and rename columns for clarity in the response
+    historical_data["Date"] = historical_data["Date"].dt.strftime("%Y-%m-%d")
+    historical_data = historical_data.rename(columns={"Date": "date", "Close": "price"})
+    
+    # Convert to a list of dictionaries
+    historical_list = historical_data.to_dict("records")
 
     try:
-        # Run yfinance in a thread pool to avoid async issues
-        loop = asyncio.get_event_loop()
-        data = await loop.run_in_executor(executor, fetch_stock_data_sync, ticker)
-        
-        # Check if we got data
-        if data is None or data.empty:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"No data available for ticker '{ticker}'. The ticker may be invalid or data unavailable."
-            )
-        
-        # Reset index to make Date a column and handle timezone-aware datetimes
-        data = data.reset_index()
-        
-        # Convert timezone-aware datetime to timezone-naive if needed
-        if 'Date' in data.columns and hasattr(data['Date'].iloc[0], 'tz'):
-            data['Date'] = data['Date'].dt.tz_localize(None)
-        
-        # Verify we have enough data
-        if len(data) < 30:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Insufficient data for ticker '{ticker}'. Got {len(data)} days, need at least 30."
-            )
-
-        # 2. Get the specific scaler for this ticker
-        scaler = SCALERS[ticker]
-        
-        # 3. Generate the recursive forecast
-        predictions = recursive_forecast(
+        preds = recursive_forecast(
             ticker_data=data,
             model=MODEL,
-            scaler=scaler,
+            scaler=SCALERS[ticker],
             feature_cols=FEATURE_COLS,
             timesteps=TIME_STEPS,
             n_features=N_FEATURES,
-            forecast_days=7
+            forecast_days=7,
         )
-        
-        # 4. Prepare dates for the response
-        last_date_actual = pd.to_datetime(data['Date'].iloc[-1])
-        # Generate 7 market days starting *after* the last known actual date
-        forecast_dates = pd.date_range(start=last_date_actual, periods=8, inclusive='right', freq='B').strftime('%Y-%m-%d').tolist()
-
-        return {
-            "ticker": ticker,
-            "predictions_7d": predictions,
-            "forecast_dates": forecast_dates,
-            "unit": "USD Close Price",
-            "last_actual_date": last_date_actual.strftime('%Y-%m-%d'),
-            "data_points_used": len(data)
-        }
-
-    except HTTPException:
-        raise
+    except ValueError as e:
+         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        print(f"An error occurred during prediction for {ticker}: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"An internal server error occurred: {str(e)}")
+         print(f"Logic error for {ticker}: {e}")
+         raise HTTPException(status_code=500, detail="Prediction failed due to calculation error.")
 
-# --- Health Check Endpoint ---
-@app.get("/health")
-async def health_check():
-    """Check if the service is running and model is loaded."""
+    last_date = pd.to_datetime(data["Date"].iloc[-1])
+    forecast_dates = pd.date_range(
+        start=last_date, 
+        periods=7, 
+        freq="B", 
+        inclusive="right"
+    ).strftime("%Y-%m-%d").tolist()
+    
+    # --- 2. Update Return Structure (New) ---
     return {
-        "status": "healthy",
-        "model_loaded": MODEL is not None,
-        "scalers_loaded": SCALERS is not None,
+        "ticker": ticker,
+        "historical_7d": historical_list, # Added
+        "predictions_7d": preds,
+        "forecast_dates": forecast_dates,
+        "last_actual_date": last_date.strftime("%Y-%m-%d"),
+        "data_points_used": len(data)
+    }
+# -------------------------
+# Health Check
+# -------------------------
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy", 
+        "model_loaded": MODEL is not None, 
+        "scalers_loaded": SCALERS is not None, 
         "features": N_FEATURES
     }
-
-# --- Run the Server ---
-# To run this file, save it as 'app.py' and execute the command:
-# uvicorn app:app --reload

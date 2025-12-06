@@ -33,7 +33,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabType>('trading');
   
   // Trading Model State
-  const [tradingOnline, setTradingOnline] = useState(false);
   const [predictions, setPredictions] = useState<PredictionsResponse | null>(null);
   const [testResults, setTestResults] = useState<TestResults | null>(null);
   const [isLoadingPredictions, setIsLoadingPredictions] = useState(false);
@@ -42,13 +41,11 @@ function App() {
   const [testError, setTestError] = useState<string | null>(null);
 
   // Monte Carlo State
-  const [monteCarloOnline, setMonteCarloOnline] = useState(false);
   const [monteCarloData, setMonteCarloData] = useState<SimulateResponse | null>(null);
   const [isLoadingMonteCarlo, setIsLoadingMonteCarlo] = useState(false);
   const [monteCarloError, setMonteCarloError] = useState<string | null>(null);
 
   // Startup Finder State
-  const [startupOnline, setStartupOnline] = useState(false);
   const [searchData, setSearchData] = useState<SearchResponse | null>(null);
   const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
   const [jobStatus, setJobStatus] = useState<JobStatus | null>(null);
@@ -59,7 +56,6 @@ function App() {
   const [industrySuggestions, setIndustrySuggestions] = useState<IndustrySuggestion[]>([]);
 
   // Willow Tree Financial State
-  const [willowTreeOnline, setWillowTreeOnline] = useState(false);
   const [marketData, setMarketData] = useState<MarketDataResponse | null>(null);
   const [optionPrice, setOptionPrice] = useState<OptionPriceResponse | null>(null);
   const [riskMetrics, setRiskMetrics] = useState<RiskMetricsResponse | null>(null);
@@ -73,31 +69,16 @@ function App() {
   const [willowTreeError, setWillowTreeError] = useState<string | null>(null);
 
   // Stock Transformer State
-  const [transformerOnline, setTransformerOnline] = useState(false);
   const [transformerData, setTransformerData] = useState<TransformerPredictionResponse | null>(null);
   const [isLoadingTransformer, setIsLoadingTransformer] = useState(false);
   const [transformerError, setTransformerError] = useState<string | null>(null);
 
   useEffect(() => {
-    checkTradingHealth();
     getModelInfo();
-    checkMonteCarloHealth();
-    checkStartupHealth();
-    checkWillowTreeHealth();
-    checkTransformerHealth();
     loadIndustrySuggestions();
   }, []);
 
   // Trading Model Functions
-  const checkTradingHealth = async () => {
-    try {
-      const data = await tradingApi.checkHealth();
-      setTradingOnline(data.model_loaded);
-    } catch {
-      setTradingOnline(false);
-    }
-  };
-
   const getModelInfo = async () => {
     try {
       await tradingApi.getModelInfo();
@@ -107,25 +88,7 @@ function App() {
   };
 
   // Monte Carlo Functions
-  const checkMonteCarloHealth = async () => {
-    try {
-      const data = await monteCarloApi.checkHealth();
-      setMonteCarloOnline(data.status === 'healthy');
-    } catch {
-      setMonteCarloOnline(false);
-    }
-  };
-
   // Startup Finder Functions
-  const checkStartupHealth = async () => {
-    try {
-      const data = await startupApi.checkHealth();
-      setStartupOnline(data.status === 'healthy');
-    } catch {
-      setStartupOnline(false);
-    }
-  };
-
   const loadIndustrySuggestions = async () => {
     try {
       const data = await startupApi.getIndustrySuggestions();
@@ -277,25 +240,6 @@ function App() {
   };
 
   // Willow Tree Financial Functions
-  const checkWillowTreeHealth = async () => {
-    try {
-      const data = await willowTreeApi.checkHealth();
-      setWillowTreeOnline(data.status === 'ok' || data.status === 'healthy');
-    } catch {
-      setWillowTreeOnline(false);
-    }
-  };
-
-  // Stock Transformer Functions
-  const checkTransformerHealth = async () => {
-    try {
-      const data = await transformerApi.checkHealth();
-      setTransformerOnline(data.status === 'healthy');
-    } catch {
-      setTransformerOnline(false);
-    }
-  };
-
   const handleGetTransformerPrediction = async (ticker: string) => {
     setIsLoadingTransformer(true);
     setTransformerError(null);
@@ -465,11 +409,6 @@ function App() {
             >
               <BarChart3 className="w-4 h-4" />
               <span>Trading Model</span>
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                tradingOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {tradingOnline ? 'Online' : 'Offline'}
-              </span>
             </button>
             <button
               onClick={() => setActiveTab('montecarlo')}
@@ -481,11 +420,6 @@ function App() {
             >
               <Activity className="w-4 h-4" />
               <span>Monte Carlo</span>
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                monteCarloOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {monteCarloOnline ? 'Online' : 'Offline'}
-              </span>
             </button>
             <button
               onClick={() => setActiveTab('startup')}
@@ -497,11 +431,6 @@ function App() {
             >
               <Rocket className="w-4 h-4" />
               <span>Startup Finder</span>
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                startupOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {startupOnline ? 'Online' : 'Offline'}
-              </span>
             </button>
             <button
               onClick={() => setActiveTab('willowtree')}
@@ -513,11 +442,6 @@ function App() {
             >
               <Banknote className="w-4 h-4" />
               <span>Willow Tree</span>
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                willowTreeOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {willowTreeOnline ? 'Online' : 'Offline'}
-              </span>
             </button>
             <button
               onClick={() => setActiveTab('transformer')}
@@ -529,11 +453,6 @@ function App() {
             >
               <Sparkles className="w-4 h-4" />
               <span>Stock Transformer</span>
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                transformerOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {transformerOnline ? 'Online' : 'Offline'}
-              </span>
             </button>
           </div>
         </div>

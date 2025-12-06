@@ -53,7 +53,7 @@ const TRADING_API_BASE = 'http://localhost:5000/api';
 const MONTECARLO_API_BASE = 'http://localhost:5004';
 const STARTUP_API_BASE = 'http://localhost:8000';
 const WILLOWTREE_API_BASE = 'http://localhost:8001';
-const TRANSFORMER_API_BASE = 'http://192.168.1.101:8080';
+const TRANSFORMER_API_BASE = 'http://localhost:8080';
 
 // Trading Model API (existing server on port 5000)
 export const tradingApi = {
