@@ -36,11 +36,22 @@ export function StockTransformer({
     ? SUPPORTED_TICKERS.filter(t => t.includes(ticker.toUpperCase()))
     : SUPPORTED_TICKERS;
 
+  // Prepare chart data with both historical and predicted prices
   const chartData = predictionData
-    ? predictionData.forecast_dates.map((date, idx) => ({
-        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        price: predictionData.predictions_7d[idx],
-      }))
+    ? [
+        // Historical data (last 7 days)
+        ...predictionData.historical_7d.map((item) => ({
+          date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          historical: item.price,
+          predicted: null,
+        })),
+        // Predicted data (next 7 days)
+        ...predictionData.forecast_dates.map((date, idx) => ({
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          historical: null,
+          predicted: predictionData.predictions_7d[idx],
+        }))
+      ]
     : [];
 
   const avgPrice = predictionData
@@ -197,17 +208,29 @@ export function StockTransformer({
                     borderRadius: '8px',
                     fontSize: '14px',
                   }}
-                  formatter={(value: number) => [`$${value.toFixed(2)}`, 'Price']}
+                  formatter={(value: number) => value ? [`$${value.toFixed(2)}`, ''] : [null, '']}
                 />
                 <Legend />
                 <Line
                   type="monotone"
-                  dataKey="price"
+                  dataKey="historical"
+                  stroke="#64748b"
+                  strokeWidth={2}
+                  dot={{ fill: '#64748b', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  name="Historical Price"
+                  connectNulls={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="predicted"
                   stroke="#0d9488"
                   strokeWidth={3}
                   dot={{ fill: '#0d9488', r: 5 }}
                   activeDot={{ r: 7 }}
                   name="Predicted Price"
+                  connectNulls={false}
+                  strokeDasharray="5 5"
                 />
               </LineChart>
             </ResponsiveContainer>
