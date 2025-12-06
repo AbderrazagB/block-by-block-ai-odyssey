@@ -1,0 +1,4 @@
+finrl @ git+https://github.com/AI4Finance-Foundation/FinRL.git@master
+
+flask>=2.2.0
+flask-cors>=3.0.0

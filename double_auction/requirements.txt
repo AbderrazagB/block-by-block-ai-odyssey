@@ -1,0 +1,10 @@
+gymnasium
+numpy
+pandas
+ray[rllib]
+tensorflow
+matplotlib
+tabulate
+six
+scikit-learn
+sortedcontainers

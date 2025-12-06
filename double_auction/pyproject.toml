@@ -1,0 +1,10 @@
+[project]
+name = "gym-continuousdoubleauction-master-main"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.3.5",
+    "yfinance>=0.2.66",
+]
