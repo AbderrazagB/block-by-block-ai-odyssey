@@ -848,5 +848,3 @@ For questions or issues:
 4. Open an issue on GitHub
 
 ---
-
-**Built with ❤️ for financial AI and quantitative trading**
