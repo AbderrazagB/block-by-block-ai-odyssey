@@ -1,0 +1,37 @@
+{
+  "repository": "AI4Finance-Foundation/FinRL",
+  "commit": "e60e26e4870f00fbc704c6297edfd9d81816b3d3",
+  "files": [
+    {
+      "path": "finrl/config.py",
+      "sha256": "48675567fd7b797d228b2d5729e7b00f824894a2303c8bb51ec62b9389c9b70e",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/finrl/config.py"
+    },
+    {
+      "path": "finrl/config_tickers.py",
+      "sha256": "124ca896ed9f8b247857a6d98c7b09cdfbf78dbae1a7b0bb769f1bb2f0708783",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/finrl/config_tickers.py"
+    },
+    {
+      "path": "finrl/meta/env_stock_trading/env_stocktrading.py",
+      "sha256": "f49e6639126f40371e1271a668dedc661060afa95b6399eac9bafbe9bbbb6fae",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/finrl/meta/env_stock_trading/env_stocktrading.py"
+    },
+    {
+      "path": "finrl/meta/preprocessor/preprocessors.py",
+      "sha256": "1231edba2e10364cfbd361733698eae2415eef068617fcb17edd044c60b03ec2",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/finrl/meta/preprocessor/preprocessors.py"
+    },
+    {
+      "path": "finrl/meta/preprocessor/yahoodownloader.py",
+      "sha256": "11360f4a06b7e41adb5bfbd853de744bab604ea4e6f8d7151ff581cfa3cf8975",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/finrl/meta/preprocessor/yahoodownloader.py"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "486a06be9075686b75b35649de0adf9076508c5d0cc5b00af7928b7a96bffe65",
+      "url": "https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL/e60e26e4870f00fbc704c6297edfd9d81816b3d3/LICENSE"
+    }
+  ],
+  "note": "Upstream environment/preprocessing code preserved; minimal package initializers avoid unrelated optional integrations."
+}

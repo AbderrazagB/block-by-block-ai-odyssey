@@ -1,0 +1,55 @@
+{
+  "mode": "fresh_gpu_training",
+  "configured_timesteps": 1000000,
+  "actual_timesteps": 1000448,
+  "seed": 42,
+  "train_rows": 44050,
+  "test_rows": 12550,
+  "tickers": [
+    "AAPL",
+    "AMZN",
+    "BAC",
+    "BEP",
+    "COP",
+    "CVX",
+    "DUK",
+    "EIX",
+    "FSLR",
+    "GOOGL",
+    "GS",
+    "IBM",
+    "JPM",
+    "META",
+    "MS",
+    "MSFT",
+    "NEE",
+    "NVDA",
+    "ORCL",
+    "PCG",
+    "PLUG",
+    "SLB",
+    "SO",
+    "WFC",
+    "XOM"
+  ],
+  "train_start": "2016-01-04",
+  "train_end": "2022-12-30",
+  "test_start": "2023-01-03",
+  "test_end": "2024-12-31",
+  "torch_version": "2.14.0+cu130",
+  "gpu": "NVIDIA RTX A3000 12GB Laptop GPU",
+  "metrics": {
+    "PPO": {
+      "return_pct": 53.14582882223227,
+      "max_drawdown_pct": -8.267241922154522,
+      "annualized_volatility_pct": 14.887680869460715,
+      "sharpe_rf_zero": 1.5149351256920343
+    },
+    "Equal-weight hold": {
+      "return_pct": 80.78108368712506,
+      "max_drawdown_pct": -13.46805242321707,
+      "annualized_volatility_pct": 16.385840546628216,
+      "sharpe_rf_zero": 1.9004130415627065
+    }
+  }
+}

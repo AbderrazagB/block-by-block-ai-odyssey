@@ -1,0 +1,33 @@
+{
+  "execution": "Decision at close t; order executes at next observation close",
+  "initial_action": "Zero orders; capital remains cash on first step",
+  "total_transaction_cost_usd": 117.0147344818116,
+  "environment_trade_counter": 6594,
+  "nonzero_filled_order_events": 49,
+  "filled_buy_events": 35,
+  "filled_sell_events": 14,
+  "dates_with_filled_orders": 15,
+  "counter_note": "Upstream trade counter may include attempted orders with zero fill; nonzero action-memory entries count filled symbol/day orders.",
+  "limitations": "Policy was trained with same-close execution; delay is a sensitivity check, not retraining. Ignores slippage/dividend cash flows and uses the same selected universe.",
+  "saved_policy_replay_matches_original": true,
+  "metrics": {
+    "PPO": {
+      "return_pct": 53.14582882223227,
+      "max_drawdown_pct": -8.267241922154522,
+      "annualized_volatility_pct": 14.887680869460715,
+      "sharpe_rf_zero": 1.5149351256920343
+    },
+    "Equal-weight hold": {
+      "return_pct": 80.78108368712506,
+      "max_drawdown_pct": -13.46805242321707,
+      "annualized_volatility_pct": 16.385840546628216,
+      "sharpe_rf_zero": 1.9004130415627065
+    },
+    "PPO: one-observation delay": {
+      "return_pct": 53.64364554765319,
+      "max_drawdown_pct": -8.247151697798882,
+      "annualized_volatility_pct": 14.849631476097017,
+      "sharpe_rf_zero": 1.5294381335339002
+    }
+  }
+}

@@ -1,20 +1,5 @@
 # Block by Block AI Odyssey 🚀
 
-## Measured ML evaluation
-
-Start with the [executed PPO notebook](RL_model/FinRL_BlockByBlock.ipynb),
-[Transformer checkpoint audit](stock_transformer/Model_training/Transformer.ipynb),
-and [reproduction guide](evaluation/README.md).
-
-- Fresh GPU PPO: **1,000,448 steps**, 25 stocks; held-out return **+53.15% vs +80.78%** for equal-weight hold.
-- Transformer: **16,872 held-out windows**, 37 stocks; **0/37 beat persistence**.
-- Matching policy normalizer, dated outputs, input snapshots and replay checks are included.
-
-These results describe the evaluated prototypes and their limitations; they do
-not establish trading profitability or unseen-ticker transfer. AI Odyssey edition
-year/placement are not inferred from the project name.
-
-
 A comprehensive financial AI toolkit featuring quantitative trading models, derivative pricing, Monte Carlo simulations, startup discovery, and advanced stock prediction models. This repository contains multiple interconnected projects for financial analysis, algorithmic trading, and investment research.
 
 ## 📋 Table of Contents

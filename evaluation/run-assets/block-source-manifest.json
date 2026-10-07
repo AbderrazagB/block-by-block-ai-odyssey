@@ -1,0 +1,264 @@
+{
+  "repository": "AbderrazagB/block-by-block-ai-odyssey",
+  "commit": "1279ee5e622bfc2de213840512670c6e43bea60f",
+  "files": [
+    {
+      "path": "stock_transformer/Model_training/Input file/AAPL.csv",
+      "bytes": 259439,
+      "sha256": "1286c9dbcb00704d21053c2e8f336fda1d36c9811f36745068a90c675f246c52",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/AAPL.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/ABBV.csv",
+      "bytes": 253408,
+      "sha256": "a525d30f9e209fc1b39f1a89ec8ffd53888719445098faded58202775f84ea56",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/ABBV.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/ADM.csv",
+      "bytes": 252222,
+      "sha256": "94271eca6ed734dc4922dc1ba553b469becc3966f5e5164330a799411ad404c2",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/ADM.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/AES.csv",
+      "bytes": 255017,
+      "sha256": "534e0c5b545dc2e4a17a0687d5b0d6878e20a2094fda72f96b9682f660bca26a",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/AES.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/AMZN.csv",
+      "bytes": 249738,
+      "sha256": "225c821fc39f50a5dad0a3423cdb48d813c658aa503fe4f80437b043057230c4",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/AMZN.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/APH.csv",
+      "bytes": 255063,
+      "sha256": "24692a30888347ef0693afab5cfa1b6934b50f59662fb06d977689eb455d2dbc",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/APH.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/ATO.csv",
+      "bytes": 250235,
+      "sha256": "711804b7b5edc84fd4d4dbdc7bc281a6c725b3b6616ad150d22122029aa46d6b",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/ATO.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/AXP.csv",
+      "bytes": 253347,
+      "sha256": "248921a73bca1e074552ff4a060e7dcf1a4530b674cfc36f4d059a7ddd0ac17b",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/AXP.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/BEN.csv",
+      "bytes": 256737,
+      "sha256": "2e174de6929910393e3dbd1fd023b1632e0f0accefe60e863121abf8fc0e7456",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/BEN.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/CAH.csv",
+      "bytes": 252384,
+      "sha256": "747b06357eb031e1dc406e46bf121a0ed508a1594d44953c111629a5c480aa10",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/CAH.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/CHRW.csv",
+      "bytes": 249463,
+      "sha256": "b71f30ed1e949c6c8027b7ddab3d42c32f2f309511aec9cb50d8981a92d639fe",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/CHRW.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/CMCSA.csv",
+      "bytes": 256760,
+      "sha256": "540bde4bf0ff58a2a01f37fefdf3ed20d89ae6d33d93df83c7cc253c49833f53",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/CMCSA.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/COST.csv",
+      "bytes": 253570,
+      "sha256": "c9e2daf81911ff37fa6c1f98cd884a11305b2f509924e9b96a0bc0eb785c0964",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/COST.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/CVX.csv",
+      "bytes": 252605,
+      "sha256": "204005ebdbc68bee9c0af416f4d5ed1bf8633cfe4a64359fab44654b4f0fa010",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/CVX.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/DE.csv",
+      "bytes": 253179,
+      "sha256": "4882a13df8db3af24f59d61b1c484efa251567a3a6cdd374497eb6ad36a4cffe",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/DE.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/DLR.csv",
+      "bytes": 252835,
+      "sha256": "20cb14d7d858f8edadba765f84e2b48530fe5cd17bcb744be6dcad1d8ab1922c",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/DLR.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/DOC.csv",
+      "bytes": 256995,
+      "sha256": "53cecea5ab8a748feade68b46e3e70b2df9c04c208346980fef6b51e9125fcee",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/DOC.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/DOW.csv",
+      "bytes": 155816,
+      "sha256": "d8549ac80bc5fef3d7970ebe9a9521798a3afd8bac8891f2c77213f1d0d9b22e",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/DOW.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/DVN.csv",
+      "bytes": 255074,
+      "sha256": "8db3d475be09ff5795700691cc8f8c299161a9f694ba6e8c97641c6b2b877018",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/DVN.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/ETR.csv",
+      "bytes": 253403,
+      "sha256": "60630a312edbb9ebcd74623543c7ad7ea5bd664b38d43c95ccac838dd3945976",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/ETR.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/EW.csv",
+      "bytes": 245686,
+      "sha256": "c68d4623eec5b688f350cf477e138e860cbb7ace5fd87ea250a49a0482812bf4",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/EW.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/FCX.csv",
+      "bytes": 257026,
+      "sha256": "481bd7f2a97d26861c86c58045296724ec65b06bf004410934ab37783b407662",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/FCX.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/FFIV.csv",
+      "bytes": 245516,
+      "sha256": "03a3a933bbac5d3dccd2f7ee0f2ef69bc5fdec6e4e6f2dad817b6defaf8f7729",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/FFIV.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/FOXA.csv",
+      "bytes": 156567,
+      "sha256": "6f3378fc501952cc060e76ad90a8cf09452a47705803ffc5be0f0466c17b0a6f",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/FOXA.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/GD.csv",
+      "bytes": 255846,
+      "sha256": "0f0e154d5a728876b690b6340422feffddfc22f43b8d17ced3e2373a74d84894",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/GD.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/GOOGL.csv",
+      "bytes": 256695,
+      "sha256": "a2f7d825723776c2d30a2fd5c0cca2348c52518d4b8c5cb2f87d74c5578bf463",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/GOOGL.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/HAL.csv",
+      "bytes": 256103,
+      "sha256": "1380fdff1c60994411de8a41dc9b427c9e84de7cb4a0403bd3056df54a6757d3",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/HAL.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/INTU.csv",
+      "bytes": 251920,
+      "sha256": "a6b76f2fea7e755376c0f3448bbd1c90c361c07df8aa126a2425ac74e9959a54",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/INTU.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/MLM.csv",
+      "bytes": 251945,
+      "sha256": "396492a40eb38e8b658fc2b4076682d4ff2bcc49e4b13f7b36af45be71edb3e4",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/MLM.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/MSFT.csv",
+      "bytes": 256302,
+      "sha256": "97b774d6b1a8e6e5f18eb80a8f8ea83729ddde5d39c78241275862cd936520a7",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/MSFT.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/OMC.csv",
+      "bytes": 250205,
+      "sha256": "754cc5709cf605a1d429f270d6d4158b581ad09286e89e33b4dd1c53c4b2e9ef",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/OMC.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/PNC.csv",
+      "bytes": 254793,
+      "sha256": "fe0702ee27c5820fc874e4aa162ecddff95fbb3f986e55cb7df76de9ea74369f",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/PNC.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/ROST.csv",
+      "bytes": 253488,
+      "sha256": "57c7d6d30e30a452dc4dbf8e2a3ae9c857e2b32e341e1d23fcead272f3ae60a5",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/ROST.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/TAP.csv",
+      "bytes": 251378,
+      "sha256": "b69746d9037be2bc792e0615c5b8db8e317c15a3387e93022031bf0b71ee0392",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/TAP.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/TPR.csv",
+      "bytes": 254764,
+      "sha256": "014280ee4eb354241daf83e310a67b63bdf297f1e1aed55145e5b3f87076c826",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/TPR.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/TSLA.csv",
+      "bytes": 253912,
+      "sha256": "3d2dc13776445546c5ebe01422abd8da644fc6907ef589ab5bbca53848ccdc3f",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/TSLA.csv"
+    },
+    {
+      "path": "stock_transformer/Model_training/Input file/VICI.csv",
+      "bytes": 186426,
+      "sha256": "5b7994081e269a38da5e30e1e63dcb4dd15c1a3d60e933e03bafc8cec0badbc9",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Input%20file/VICI.csv"
+    },
+    {
+      "path": "stock_transformer/server/server/model/transformer_stock.weights.h5",
+      "bytes": 3236128,
+      "sha256": "df61cb0e3b20d127413ad553afc1a33d7cc21e9360a76b4dca69f70b781c5d50",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/server/server/model/transformer_stock.weights.h5"
+    },
+    {
+      "path": "stock_transformer/server/server/model/all_scalers.pkl",
+      "bytes": 46009,
+      "sha256": "4663d2cae165aed02b746a9c63dedfe0ab4a22423d74f841eda5ffb1f387420a",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/server/server/model/all_scalers.pkl"
+    },
+    {
+      "path": "stock_transformer/server/server/model/feature_cols.pkl",
+      "bytes": 247,
+      "sha256": "b103a333249f18a884c7343506f43f491daefcf70c18b9f182e926d1d16f3ce5",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/server/server/model/feature_cols.pkl"
+    },
+    {
+      "path": "stock_transformer/server/server/requirements.txt",
+      "bytes": 101,
+      "sha256": "e87d50dba1ba05119a19c3ffb1a84e29c1ee619a240a258a7e9c73e35d347c2b",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/server/server/requirements.txt"
+    },
+    {
+      "path": "ENV_SETUP.md",
+      "bytes": 3697,
+      "sha256": "e4376261b2efc3ee337149c291815e4fa370d17be87fa600e568715181b44187",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/ENV_SETUP.md"
+    },
+    {
+      "path": "README.md",
+      "bytes": 25665,
+      "sha256": "721723fd2d041300755ee46f02e37482769d4b54f2aacbc97da9f4a28feeb966",
+      "url": "https://raw.githubusercontent.com/AbderrazagB/block-by-block-ai-odyssey/1279ee5e622bfc2de213840512670c6e43bea60f/README.md"
+    }
+  ]
+}

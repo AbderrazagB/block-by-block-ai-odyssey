@@ -1,0 +1,17 @@
+{
+  "repository": "AbderrazagB/block-by-block-ai-odyssey",
+  "commit": "1279ee5e622bfc2de213840512670c6e43bea60f",
+  "sources": [
+    {
+      "local_file": "original_training_code.txt",
+      "url": "https://github.com/AbderrazagB/block-by-block-ai-odyssey/blob/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/Model_training/Transformer.ipynb",
+      "note": "Code cells extracted without executing the original notebook",
+      "sha256": "5e1cf2ec8d11444c726d368b566b5cdbbe0265116c78dc5a732ef2d04a5988c0"
+    },
+    {
+      "local_file": "original_app.py",
+      "url": "https://github.com/AbderrazagB/block-by-block-ai-odyssey/blob/1279ee5e622bfc2de213840512670c6e43bea60f/stock_transformer/server/server/app.py",
+      "sha256": "fcfe491939895b9caa3bd39ce80742dbe4798344d80903b60255b544df07ced2"
+    }
+  ]
+}

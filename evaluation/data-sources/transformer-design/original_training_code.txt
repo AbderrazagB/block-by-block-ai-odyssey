@@ -1,0 +1,641 @@
+import numpy as np
+import pandas as pd
+from sklearn import preprocessing
+from matplotlib.pylab import rcParams
+from datetime import datetime
+import warnings
+from pylab import rcParams
+from sklearn.model_selection import train_test_split as split
+import warnings
+import itertools
+warnings.filterwarnings("ignore")
+from IPython import display
+from matplotlib import pyplot
+import os
+import re
+import plotly.express as px
+import warnings
+from matplotlib.patches import Patch
+
+import os
+fileList = os.listdir("./Input file")
+fileList
+
+#companyName != "" and companyName !="sample_data"
+companyList = []
+for file in fileList:
+    companyName = file.split(".")[0]
+    if  companyName != "" and companyName !="sample_data":
+        companyList.append(companyName)
+print(companyList)
+
+import pandas as pd
+# First, we get the data - Updated to use all 37 tickers with 2015-2025 data
+stockList = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA",
+             'GD', 'DE', 'CHRW', 'ABBV', 'CAH', 'EW', 'INTU',
+             'FFIV', 'APH', 'ETR', 'ATO', 'AES', 'BEN', 'AXP',
+             'PNC', 'DOW', 'MLM', 'FCX', 'ROST', 'TPR',
+             'DLR', 'DOC', 'VICI', 'OMC', 'FOXA', 'CMCSA',
+             'ADM', 'TAP', 'COST', 'CVX', 'HAL', 'DVN']
+
+df_ = {}
+for i in stockList:
+    df_[i] = pd.read_csv("./Input file/" + i + ".csv", index_col = 'Date')
+
+for i in stockList:
+    print(f"{i} data shape: {df_[i].shape}")
+
+from sklearn.model_selection import train_test_split
+def split(dataframe, border, col):
+    return dataframe.loc[:border,col], dataframe.loc[border:,col]
+
+df_new = {}
+for i in stockList:
+    df_new[i] = {}
+    # train / test split: 2015-2023 for train, 2023-2025 for test
+    df_new[i]["Train"] = df_[i].query('Date < "2024-01-01"').reset_index(drop = False)
+    df_new[i]["Test"]  = df_[i].query('Date >= "2024-01-01"').reset_index(drop = False)
+
+# Feature Engineering: Add technical indicators
+def add_technical_features(df):
+    """Add technical indicators to the dataframe"""
+    df = df.copy()
+    
+    # 1. Returns (daily price change percentage)
+    df['Returns'] = df['Close'].pct_change()
+    
+    # 2. Moving Averages
+    df['MA_5'] = df['Close'].rolling(window=5).mean()
+    df['MA_10'] = df['Close'].rolling(window=10).mean()
+    df['MA_20'] = df['Close'].rolling(window=20).mean()
+    
+    # 3. Exponential Moving Average
+    df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
+    
+    # 4. Volatility (standard deviation of returns)
+    df['Volatility'] = df['Returns'].rolling(window=10).std()
+    
+    # 5. Price momentum
+    df['Momentum'] = df['Close'] - df['Close'].shift(5)
+    
+    # 6. Relative Strength Index (RSI)
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    rs = gain / loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    
+    # 7. MACD (Moving Average Convergence Divergence)
+    exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+    exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+    df['MACD'] = exp1 - exp2
+    df['MACD_Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+    
+    # 8. Bollinger Bands
+    df['BB_Middle'] = df['Close'].rolling(window=20).mean()
+    df['BB_Std'] = df['Close'].rolling(window=20).std()
+    df['BB_Upper'] = df['BB_Middle'] + (df['BB_Std'] * 2)
+    df['BB_Lower'] = df['BB_Middle'] - (df['BB_Std'] * 2)
+    
+    # 9. Volume indicators
+    df['Volume_MA'] = df['Volume'].rolling(window=5).mean()
+    df['Volume_Ratio'] = df['Volume'] / df['Volume_MA']
+    
+    # 10. Price range indicators
+    df['High_Low_Diff'] = df['High'] - df['Low']
+    df['High_Low_Pct'] = (df['High'] - df['Low']) / df['Low']
+    
+    # Drop NaN values created by rolling calculations
+    df = df.dropna()
+    
+    return df
+
+# Apply feature engineering to all stocks
+for i in stockList:
+    df_new[i]["Train"] = add_technical_features(df_new[i]["Train"])
+    df_new[i]["Test"] = add_technical_features(df_new[i]["Test"])
+    
+print("Feature engineering complete!")
+print(f"Features added: {df_new[stockList[0]]['Train'].columns.tolist()}")
+
+df_new[i]["Train"]
+
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+
+# Define features to use (all columns except Date)
+# We'll scale all numerical features together
+transform_train = {}
+transform_test = {}
+scaler = {}
+
+for num, i in enumerate(stockList):
+    sc = MinMaxScaler(feature_range=(0,1))
+    
+    # Get all feature columns (excluding 'Date')
+    feature_cols = [col for col in df_new[i]["Train"].columns if col != 'Date']
+    
+    # Extract features as numpy arrays
+    a0 = df_new[i]["Train"][feature_cols].values
+    a1 = df_new[i]["Test"][feature_cols].values
+    
+    # Fit scaler on training data only, transform both train and test
+    transform_train[i] = sc.fit_transform(a0)  # Fit on train
+    transform_test[i] = sc.transform(a1)  # Only transform test - NO FIT! ✓
+    scaler[i] = sc
+
+print(f"Number of features: {len(feature_cols)}")
+print(f"Features used: {feature_cols}")
+
+for i in transform_train.keys():
+    print(i, transform_train[i].shape)
+print("\n")
+for i in transform_test.keys():
+    print(i, transform_test[i].shape)
+
+trainset = {}
+testset = {}
+
+# Determine number of features from the scaled data
+n_features = transform_train[stockList[0]].shape[1]
+
+for j in stockList:
+    trainset[j] = {}
+    X_train = []
+    y_train = []
+    # Dynamically determine the range based on actual data size
+    train_size = len(transform_train[j])
+    for i in range(10, train_size):
+        X_train.append(transform_train[j][i-10:i, :])  # All features
+        y_train.append(transform_train[j][i, 0])  # Predict Close price (first column)
+    X_train, y_train = np.array(X_train), np.array(y_train)
+    trainset[j]["X"] = X_train  # Shape: (samples, timesteps, features)
+    trainset[j]["y"] = y_train
+
+    testset[j] = {}
+    X_test = []
+    y_test = []
+    # Dynamically determine the range based on actual data size
+    test_size = len(transform_test[j])
+    for i in range(10, test_size):
+        X_test.append(transform_test[j][i-10:i, :])  # All features
+        y_test.append(transform_test[j][i, 0])  # Predict Close price (first column)
+    X_test, y_test = np.array(X_test), np.array(y_test)
+    testset[j]["X"] = X_test  # Shape: (samples, timesteps, features)
+    testset[j]["y"] = y_test
+
+print(f"Training set shape: {trainset[stockList[0]]['X'].shape}")
+print(f"Test set shape: {testset[stockList[0]]['X'].shape}")
+print(f"Features per timestep: {n_features}")
+
+arr_buff = []
+for i in stockList:
+    buff = {}
+    buff["X_train"] = trainset[i]["X"].shape
+    buff["y_train"] = trainset[i]["y"].shape
+    buff["X_test"] = testset[i]["X"].shape
+    buff["y_test"] = testset[i]["y"].shape
+    arr_buff.append(buff)
+
+pd.DataFrame(arr_buff, index=stockList)
+
+from random import random
+from numpy import array
+from numpy import cumsum
+from keras.models import Sequential
+from keras.layers import LSTM
+from keras.layers import Dense
+from keras.layers import TimeDistributed
+from keras.layers import Bidirectional
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from sklearn import metrics
+from keras.layers import Input, Dense, LSTM, Conv1D, Dropout, Bidirectional, Multiply
+from keras.models import Model
+# from attention_utils import get_activations
+from keras.layers import *
+from keras.layers import LSTM
+from keras.models import *
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+tf.random.set_seed(1234)
+from keras import backend as K
+from keras.layers import InputLayer
+from keras.optimizers import Adam
+from keras import layers
+from keras.models import Model
+from keras.layers import Flatten
+import sqlite3
+from datetime import datetime
+from numpy.random import seed
+
+def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+
+    # Normalization and Attention
+    # "EMBEDDING LAYER"
+    x = layers.LayerNormalization(epsilon=1e-6)(inputs)
+
+    # "ATTENTION LAYER"
+    x = layers.MultiHeadAttention(
+        key_dim=head_size, num_heads=num_heads, dropout=dropout
+    )(x, x)
+    x = layers.Dropout(dropout)(x)
+    res = x + inputs
+
+    # FEED FORWARD Part - you can stick anything here or just delete the whole section - it will still work.
+    return x + res
+
+def build_model(
+    input_shape,
+    head_size,
+    num_heads,
+    ff_dim,
+    num_transformer_blocks,
+    mlp_units,
+    dropout=0,
+    mlp_dropout=0,
+):
+    inputs = keras.Input(shape=input_shape)
+    x = inputs
+
+    for _ in range(num_transformer_blocks):  # This is what stacks our transformer blocks
+        x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
+
+    x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
+    for dim in mlp_units:
+        x = layers.Dense(dim, activation="elu")(x)
+        x = layers.Dropout(mlp_dropout)(x)
+    outputs = layers.Dense(1, activation="linear")(x) #this is a pass-through
+    return keras.Model(inputs, outputs)
+
+time_steps = 10
+n_features = trainset[stockList[0]]["X"].shape[2]  # Get number of features dynamically
+input_shape = (time_steps, n_features)
+
+print(f"Model input shape: {input_shape}")
+
+model = build_model(
+    input_shape,
+    head_size=46, # Embedding size for attention
+    num_heads=60, # Number of attention heads
+    ff_dim=55, # Hidden layer size in feed forward network inside transformer
+    num_transformer_blocks = 1,
+    mlp_units=[256],
+    mlp_dropout=0.4,
+    dropout=0.14,
+)
+
+model.compile(
+    loss="mean_squared_error",
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+    metrics=["mean_squared_error"],
+)
+model.summary()
+
+# FIXED: Train ONE model on ALL stocks combined
+print("Combining data from all stocks...")
+X_train_combined = np.concatenate([trainset[i]["X"] for i in stockList], axis=0)
+y_train_combined = np.concatenate([trainset[i]["y"] for i in stockList], axis=0)
+
+print(f"Combined training data shape: X={X_train_combined.shape}, y={y_train_combined.shape}")
+print(f"Training single model on all {len(stockList)} stocks...")
+
+# Force CPU usage to avoid CUDA issues
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+# Add early stopping callback
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
+early_stopping = EarlyStopping(
+    monitor='val_loss',           # Monitor validation loss
+    patience=15,                  # Stop after 15 epochs with no improvement
+    restore_best_weights=True,    # Restore weights from best epoch
+    verbose=1
+)
+
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',           # Monitor validation loss
+    factor=0.5,                   # Reduce LR by half
+    patience=7,                   # After 7 epochs with no improvement
+    min_lr=1e-7,                  # Minimum learning rate
+    verbose=1
+)
+
+history = model.fit(
+    X_train_combined, 
+    y_train_combined, 
+    epochs=100, 
+    batch_size=20, 
+    validation_split=0.2,
+    callbacks=[early_stopping, reduce_lr],  # Add callbacks
+    verbose=1
+)
+
+print(f"\nTraining stopped at epoch: {len(history.history['loss'])}")
+
+from tensorflow.keras.models import Model
+
+# Plot training history for the combined model
+# Create directory for saving plots
+import os
+os.makedirs('price_pred_plots', exist_ok=True)
+
+plt.rcParams['figure.figsize'] = (10,8)
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Combined Model Loss (All Stocks)')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'validation'], loc='upper left')
+plt.savefig('price_pred_plots/training_loss.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Predict for each stock using the single trained model
+# Create directory for saving plots
+import os
+os.makedirs('price_pred_plots', exist_ok=True)
+
+pred_result = {}
+for i in stockList:
+    # Get predictions
+    y_pred_scaled = model.predict(testset[i]["X"], verbose=0)
+    y_true_scaled = testset[i]["y"].reshape(-1, 1)
+    
+    # Create dummy arrays to inverse transform (need all features)
+    # We only care about the first column (Close price)
+    n_features = transform_test[i].shape[1]
+    
+    # Inverse transform: create array with all features, but only Close matters
+    y_true_full = np.zeros((len(y_true_scaled), n_features))
+    y_true_full[:, 0] = y_true_scaled.flatten()
+    y_true = scaler[i].inverse_transform(y_true_full)[:, 0]
+    
+    y_pred_full = np.zeros((len(y_pred_scaled), n_features))
+    y_pred_full[:, 0] = y_pred_scaled.flatten()
+    y_pred = scaler[i].inverse_transform(y_pred_full)[:, 0]
+    
+    pred_result[i] = {}
+    pred_result[i]["True"] = y_true
+    pred_result[i]["Pred"] = y_pred
+    
+    plt.figure(figsize=(8,8))
+    plt.title("{}".format(i))
+    plt.plot(y_true, color = 'b')
+    plt.plot(y_pred, color = 'r')
+    plt.xlabel("Time value (day)")
+    plt.ylabel("Close value (point)")
+    plt.legend(('actual', 'prediction'),loc='upper left', fontsize=12)
+    plt.savefig(f'price_pred_plots/{i}_full_test_prediction.png', dpi=300, bbox_inches='tight')
+    plt.close()  # Close the figure to save memory
+
+# Zoomed prediction visualization for specific stocks
+# Create directory for saving plots
+import os
+os.makedirs('price_pred_plots', exist_ok=True)
+
+specific_stocks = stockList[:3] # First 3 stocks
+zoom_days = 50  # Last 50 days for detailed inspection
+
+pred_result = {}
+
+for i in specific_stocks:
+    # Get raw predictions
+    raw_pred = model.predict(testset[i]["X"], verbose=0)
+    
+    # Inverse transform to get real prices
+    n_features = transform_test[i].shape[1]
+    
+    # Create arrays for inverse transformation
+    y_true_scaled = testset[i]["y"].reshape(-1, 1)
+    y_true_full = np.zeros((len(y_true_scaled), n_features))
+    y_true_full[:, 0] = y_true_scaled.flatten()
+    y_true = scaler[i].inverse_transform(y_true_full)[:, 0]
+    
+    y_pred_full = np.zeros((len(raw_pred), n_features))
+    y_pred_full[:, 0] = raw_pred.flatten()
+    y_pred = scaler[i].inverse_transform(y_pred_full)[:, 0]
+    
+    # Store results
+    pred_result[i] = {}
+    pred_result[i]["True"] = y_true
+    pred_result[i]["Pred"] = y_pred
+    
+    # --- PLOTTING ---
+    plt.figure(figsize=(12, 6))
+    
+    # Slice the data to show only the last 'zoom_days'
+    if len(y_true) > zoom_days:
+        plt.plot(y_true[-zoom_days:], color='b', label='Actual', linewidth=2)
+        plt.plot(y_pred[-zoom_days:], color='r', label='Predicted', linewidth=1.5, linestyle='--')
+        plt.title(f"{i} - Last {zoom_days} Days (Zoomed Inspection)")
+    else:
+        # If data is shorter than zoom_days, plot everything
+        plt.plot(y_true, color='b', label='Actual')
+        plt.plot(y_pred, color='r', label='Predicted')
+        plt.title(f"{i} - Full Test Set")
+
+    plt.xlabel("Time (Days)")
+    plt.ylabel("Price ($)")
+    plt.legend(loc='upper left', fontsize=12)
+    plt.grid(True, alpha=0.3)
+    plt.savefig(f'price_pred_plots/{i}_zoomed_{zoom_days}days.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+# %% [Code for 7-Day Forecasting]
+
+def recursive_forecast(model, scaler, df_test, timesteps, n_features, forecast_days=7):
+    """
+    Generates an n-day forecast recursively.
+
+    Args:
+        model: Trained Keras model.
+        scaler: Fitted MinMaxScaler.
+        df_test: DataFrame containing the actual test data (used to get the last known sequence).
+        timesteps: Look-back window (10 in your case).
+        n_features: Number of input features.
+        forecast_days: Number of days to predict.
+
+    Returns:
+        tuple: (list of 7 predicted prices, list of 10 input prices, inverse-transformed input sequence)
+    """
+    
+    # 1. Get the last 'timesteps' days of actual data (the starting sequence)
+    last_sequence_df = df_test.tail(timesteps)
+    
+    # Extract only the feature columns
+    feature_cols = [col for col in last_sequence_df.columns if col != 'Date']
+    
+    # Get the actual Close price from the start sequence for plotting
+    historical_close = last_sequence_df['Close'].values
+    
+    # Scale the last sequence to get the starting input array (X_input)
+    X_input_scaled = scaler.transform(last_sequence_df[feature_cols].values)
+    
+    # Ensure shape is correct for model (1, timesteps, features)
+    X_input_scaled = X_input_scaled.reshape(1, timesteps, n_features)
+    
+    # Initialize list to store predictions
+    predicted_prices = []
+    
+    # 2. Recursive Loop
+    for _ in range(forecast_days):
+        # Predict the next step (P_t+1)
+        next_step_scaled = model.predict(X_input_scaled, verbose=0)
+        
+        # --- CRITICAL STEP: Update the input sequence ---
+        
+        # We assume all features *except* Close will be the same as the last known day.
+        # This is a simplification; for a real model, you'd need external forecasts for all features.
+        
+        # 2a. Create the new timestep features vector (n_features)
+        # Copy the last feature set (e.g., all MAs, RSI, etc.) from the end of the current sequence.
+        new_timestep = X_input_scaled[0, -1, :].copy() 
+        
+        # 2b. Inject the predicted Close price into the first feature slot (index 0)
+        new_timestep[0] = next_step_scaled[0, 0] # Close is the first feature (index 0)
+
+        # 2c. Update the sequence: Drop the oldest day, append the new prediction
+        # X_input_scaled[0] is the (timesteps, n_features) array
+        X_input_scaled = np.roll(X_input_scaled, -1, axis=1) # Shift all timesteps one position left
+        X_input_scaled[0, -1, :] = new_timestep # Replace the last slot with the new prediction
+
+        # Inverse transform the predicted Close price for output and store it
+        # Needs to be a full feature vector for inverse_transform
+        temp_full = np.zeros((1, n_features))
+        temp_full[0, 0] = next_step_scaled[0, 0] # Set the scaled Close price
+        predicted_price = scaler.inverse_transform(temp_full)[0, 0]
+        
+        predicted_prices.append(predicted_price)
+
+    return predicted_prices, historical_close, last_sequence_df['Date'].values
+
+# %% [Plotting the 7-Day Forecast]
+# Create directory for saving plots
+import os
+os.makedirs('price_pred_plots', exist_ok=True)
+
+# Select specific stocks for the multi-step plot
+forecast_stocks = ['AAPL', 'MSFT', 'TSLA', 'BEN', 'CVX']
+forecast_days = 7
+days_to_show_history = 30 # Plot the last 30 days of actual data plus 7 forecast days
+
+for i in forecast_stocks:
+    # 1. Get the last known data for this stock
+    df_test_full = df_[i].query('Date >= "2024-01-01"').reset_index(drop = False)
+    
+    # Re-apply feature engineering on the *full* data to get a clean, final test set
+    df_test_final = add_technical_features(df_test_full)
+    
+    # Find the date index for slicing
+    last_train_date = df_new[i]["Train"]["Date"].iloc[-1]
+    
+    # 2. Generate the 7-day forecast
+    # We use the end of the `df_test_final` data for the starting point
+    predicted_prices_7d, historical_prices_10d, historical_dates_10d = recursive_forecast(
+        model, 
+        scaler[i], 
+        df_test_final, 
+        timesteps=10, 
+        n_features=n_features, 
+        forecast_days=forecast_days
+    )
+    
+    # --- Prepare Plotting Data ---
+    
+    # Actual historical data for the plot (last N days of actual test data)
+    plot_data = df_test_final.tail(days_to_show_history)
+    plot_dates = pd.to_datetime(plot_data['Date']).tolist()
+    plot_prices = plot_data['Close'].values
+    
+    # Generate dates for the forecast period (starting the day after the last actual date)
+    last_date_actual = plot_dates[-1]
+    forecast_dates = pd.date_range(start=last_date_actual, periods=forecast_days + 1, inclusive='right').tolist()
+    
+    # Combine historical and forecast data for the plot
+    full_dates = plot_dates + forecast_dates
+    # The forecast starts where the actual data ends
+    full_prices = np.concatenate([plot_prices, predicted_prices_7d]) 
+
+    # --- Plotting ---
+    plt.figure(figsize=(14, 7))
+    plt.title(f"{i} - {forecast_days}-Day Recursive Forecast")
+    
+    # Plot Actual Data (History)
+    plt.plot(plot_dates, plot_prices, label='Actual History', color='blue', linewidth=2)
+    
+    # Plot Prediction (Forecast)
+    plt.plot(full_dates[-forecast_days-1:], full_prices[-forecast_days-1:], 
+             label=f'{forecast_days}-Day Forecast', color='red', linestyle='--', marker='o', markersize=4)
+
+    # Vertical line to separate history from forecast
+    plt.axvline(x=last_date_actual, color='gray', linestyle=':', linewidth=1)
+    
+    plt.xlabel("Date")
+    plt.ylabel("Close Price ($)")
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.grid(True, alpha=0.5)
+    plt.savefig(f'price_pred_plots/{i}_7day_forecast.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
+# %%
+
+
+
+"""
+Quick script to save model weights after training.
+Run this in your notebook or after loading the trained model.
+
+Usage in notebook:
+    %run save_weights.py
+"""
+
+import joblib
+import os
+
+# Create model directory
+os.makedirs('../server/model', exist_ok=True)
+
+print("=" * 60)
+print("SAVING MODEL ARTIFACTS FOR API SERVER")
+print("=" * 60)
+
+# 1. Save model WEIGHTS (not full model)
+print("\n1. Saving model weights...")
+try:
+    model.save_weights('../server/model/transformer_stock.weights.h5')
+    print("   ✅ Model weights saved to ../server/model/transformer_stock_weights.h5")
+except Exception as e:
+    print(f"   ❌ Error saving model weights: {e}")
+    print("   Make sure 'model' variable exists in your namespace")
+
+# 2. Save all scalers
+print("\n2. Saving scalers...")
+try:
+    joblib.dump(scaler, '../server/model/all_scalers.pkl')
+    print("   ✅ Scalers saved to ../server/model/all_scalers.pkl")
+except Exception as e:
+    print(f"   ❌ Error saving scalers: {e}")
+    print("   Make sure 'scaler' variable exists in your namespace")
+
+# 3. Save feature columns
+print("\n3. Saving feature columns...")
+try:
+    joblib.dump(feature_cols, '../server/model/feature_cols.pkl')
+    print("   ✅ Feature columns saved to ../server/model/feature_cols.pkl")
+except Exception as e:
+    print(f"   ❌ Error saving feature columns: {e}")
+    print("   Make sure 'feature_cols' variable exists in your namespace")
+
+print("\n" + "=" * 60)
+print("🎉 DONE! You can now restart the FastAPI server:")
+print("   cd ../server && uvicorn app:app --reload --port 8080")
+print("=" * 60)
+
+

@@ -1,0 +1,14 @@
+{
+  "mode": "repository_checkpoint_evaluation",
+  "tickers": 37,
+  "test_windows": 16872,
+  "tickers_better_than_persistence": 0,
+  "median_mae_improvement_pct": -190.99235000035927,
+  "macro_model_mae_pct_mean_price": 4.293954827397979,
+  "macro_persistence_mae_pct_mean_price": 1.2640946531926234,
+  "scalers_matching_available_training_csvs": 37,
+  "keras_version": "3.15.1",
+  "backend": "torch",
+  "torch_version": "2.14.0+cu130",
+  "gpu": "['NVIDIA RTX A3000 12GB Laptop GPU']"
+}
