@@ -1,0 +1,20 @@
+{
+  "ticker": "AAPL",
+  "background_states": 30,
+  "explained_states": 20,
+  "features": 201,
+  "coalitions_per_state": 200,
+  "seed": 42,
+  "l1_reg": "num_features(10)",
+  "explanation_start": "2023-02-15",
+  "explanation_end": "2023-03-15",
+  "reference_expected_action": 0.21714957021176817,
+  "minimum_sample_action": 0.30740001797676086,
+  "maximum_sample_action": 0.6547839641571045,
+  "maximum_additivity_error": 5.960464477539063e-08,
+  "elapsed_seconds": 0.3995596219901927,
+  "device": "cuda",
+  "shap_version": "0.52.0",
+  "policy_retrained": false,
+  "scope": "Single clipped stock action; not executed fills or portfolio returns"
+}

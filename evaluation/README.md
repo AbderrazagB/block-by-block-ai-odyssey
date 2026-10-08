@@ -75,6 +75,10 @@ is claimed. Keras uses its PyTorch backend for the Transformer checkpoint audit.
 
 One seed and one period do not establish robustness. Selected stock universe,
 survivorship risk, no slippage/dividend accounting and same-close execution limit
-the backtest. The optional SHAP cell remains disabled. No test-set tuning is
+the backtest. The SHAP cell has now executed against the saved CUDA PPO policy and frozen training normalizer: 20 AAPL actions (2023-02-15–2023-03-15), referenced to the first 30 test states. It uses a 200-coalition budget and sparse per-observation feature selection. Attributions explain one policy output, not executed fills, portfolio returns or causal feature effects. State snapshots are recorded before each decision; saved-policy replay still reproduces the original accounts.
+
+![AAPL action SHAP diagnostic](runs/ppo/plots/selected_action_shap.png)
+
+[Recorded settings and checks](runs/ppo/selected_action_shap_summary.json) · [Feature attribution table](runs/ppo/selected_action_shap_importance.csv) · [Reference, sample and SHAP arrays](runs/ppo/selected_action_shap.npz) No test-set tuning is
 presented as an improvement. Saved outputs come from the completed local GPU run;
 portable path/context edits were made for publication and replay-checked.
