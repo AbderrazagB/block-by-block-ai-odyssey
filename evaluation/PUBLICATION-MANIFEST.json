@@ -1,8 +1,8 @@
 {
   "files": {
     "RL_model/FinRL_BlockByBlock.ipynb": {
-      "bytes": 121191,
-      "sha256": "29a87723b738b6e53446fd588c6b04aaf25aed17a619229cc165c86e40cc7371"
+      "bytes": 121168,
+      "sha256": "9323c42c58c149514a3812d317f67b587c6800e98eadaaf3fe2729d16dc260b6"
     },
     "evaluation/.gitignore": {
       "bytes": 139,
@@ -69,12 +69,12 @@
       "sha256": "06c764915472804ae67f6331871b0d49b151ad31765ee0591222300805135d7e"
     },
     "evaluation/reports/FinRL_BlockByBlock.html": {
-      "bytes": 465789,
-      "sha256": "dffd181e35d5af7b413e5b43791ee7c8abc51a8b9f0c44c52fa18df933330a28"
+      "bytes": 465720,
+      "sha256": "a32d98d2f387faa7c19fc0d4e6e263ad5876db518f59edcabe763e5c6deb835e"
     },
     "evaluation/reports/Transformer.html": {
-      "bytes": 634969,
-      "sha256": "a207ac61008d99f77fed117485dc51f609cc668dac8e60aa701a6837410fe528"
+      "bytes": 634930,
+      "sha256": "8e8e4e5d9f3d7e448768d0c8f1b7b3f2d8a6d99e2ef431e46501826ad12c7b76"
     },
     "evaluation/requirements-gpu.lock.txt": {
       "bytes": 2350,
@@ -417,8 +417,8 @@
       "sha256": "c19b0867da4ff605b442c3c87bdd90e6b92b6f688a3dab512a15752395b5d2f7"
     },
     "evaluation/runs/previews/Transformer.html": {
-      "bytes": 634969,
-      "sha256": "a207ac61008d99f77fed117485dc51f609cc668dac8e60aa701a6837410fe528"
+      "bytes": 634930,
+      "sha256": "8e8e4e5d9f3d7e448768d0c8f1b7b3f2d8a6d99e2ef431e46501826ad12c7b76"
     },
     "evaluation/runs/transformer/dated_predictions.csv": {
       "bytes": 1180559,
@@ -497,8 +497,8 @@
       "sha256": "56d2e5cc6fb7e51b04e49627c84ce1a007adcd4852d95c81fa1ad4d46b471cea"
     },
     "stock_transformer/Model_training/Transformer.ipynb": {
-      "bytes": 330014,
-      "sha256": "55f8fedf60c2e819a5ac1a5a4f75515c74be70ee46e6859969201e038da9ab98"
+      "bytes": 330001,
+      "sha256": "65aa540fba54be39755294950a33f8a51d6cc8d2c7ef190a2095d7e3ebd5adec"
     },
     "evaluation/runs/ppo/plots/selected_action_shap.png": {
       "bytes": 66761,
